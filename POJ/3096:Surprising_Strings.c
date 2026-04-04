@@ -26,7 +26,7 @@ int main() {
 		if (*buff == '*') break;
 		trimNewline(buff);
 		int8_t isSurprising = 1;
-		size_t length = strlen(buff);
+		int length = strlen(buff);
 		for (int i = 0; i < length - 2; i++) {
 			memset(pairs, 0, 26 * 26);
 			if (checkPairs(buff, pairs, i, length)) {
