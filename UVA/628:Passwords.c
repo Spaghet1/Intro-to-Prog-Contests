@@ -3,14 +3,12 @@
 #include <string.h>
 
 void printRule(const char* rule, char** words, const int numWords, char* digits) {
-	int wordIndexes[numWords];
-	int digitIndexes[8];
+	int wordIndexes[256];
+	int digitIndexes[256];
 	memset(wordIndexes, 0, sizeof(wordIndexes));
 	memset(digitIndexes, 0, sizeof(digitIndexes));
 	char* stack[256];
 	int stackptr = 0;
-	int wordptr = 0;
-	int digitptr = 0;
 	while (stackptr >= 0) {
 		switch (rule[stackptr]) {
 			case '#': 
@@ -50,12 +48,13 @@ int main() {
 	char buffer[256];
 	char digits[] = {'0', '\0', '1', '\0', '2', '\0', '3', '\0', '4', '\0', '5', '\0', '6', '\0', '7', '\0', '8', '\0', '9', '\0'};
 	while (fgets(buffer, sizeof(buffer), stdin)) {
+		printf("--\n");
 		int numWords = atoi(buffer);
 		char* words[numWords];
 		for (int i = 0; i < numWords; i++) {
 			fgets(buffer, sizeof(buffer), stdin);
 			if (buffer[strlen(buffer) - 1] == '\n') buffer[strlen(buffer) - 1] = '\0';
-			char* word = malloc(strlen(buffer) + 1);
+			char* word = (char*) malloc(strlen(buffer) + 1);
 			strcpy(word, buffer);
 			words[i] = word;
 		}
