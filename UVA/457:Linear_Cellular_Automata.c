@@ -21,7 +21,7 @@ int main() {
 			}
 			printf("\n");
 		}
-		printf("\n");
+		if (testCase != testCases - 1) printf("\n");
 	}
 	return 0;
 }
