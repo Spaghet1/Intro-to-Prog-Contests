@@ -2,3 +2,6 @@ testing
 a.out*
 UVA/UVA_screenshots
 .*
+.gitignore
+UCSD_ICPC_TEMP
+
