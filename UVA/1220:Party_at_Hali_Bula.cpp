@@ -4,22 +4,30 @@
 #include <vector>
 using namespace std;
 
-void dfs(vector<vector<int>>& tree, int curr, vector<vector<int>>& inOrOut, vector<vector<bool>>& ambigInOrOut) {
-    for (int i : tree[curr]) {
-        dfs(tree, i, inOrOut, ambigInOrOut);
-        inOrOut[0][curr] += inOrOut[1][i];
-        if (ambigInOrOut[1][i]) ambigInOrOut[0][curr] = true;
-        if (inOrOut[0][i] > inOrOut[1][i]) {
-            inOrOut[1][curr] += inOrOut[0][i];
-            ambigInOrOut[1][curr] = ambigInOrOut[1][curr] || ambigInOrOut[0][i];
-        }
-        else if (inOrOut[0][i] < inOrOut[1][i]) {
-            inOrOut[1][curr] += inOrOut[1][i];
-            ambigInOrOut[1][curr] = ambigInOrOut[1][curr] || ambigInOrOut[1][i];
+struct WeightUnique {
+    int weight;
+    bool isUnique;
+};
+
+void dfs(vector<vector<int>>& tree, int curr, vector<WeightUnique>& in, vector<WeightUnique>& out) {
+    in[curr].weight = 1;
+    in[curr].isUnique = true;
+    out[curr].weight = 0;
+    out[curr].isUnique = true;
+    for (int child : tree[curr]) {
+        dfs(tree, child, in, out);
+
+        if (out[child].isUnique == false) in[curr].isUnique = false;
+        in[curr].weight += out[child].weight;
+
+        if (in[child].weight == out[child].weight) out[curr].isUnique = false;
+        if (in[child].weight > out[child].weight) {
+            if (in[child].isUnique == false) out[curr].isUnique = false;
+            out[curr].weight += in[child].weight;
         }
         else {
-            inOrOut[1][curr] += inOrOut[0][i];
-            ambigInOrOut[1][curr] = true;
+            if (out[child].isUnique == false) out[curr].isUnique = false;
+            out[curr].weight += out[child].weight;
         }
     }
 }
@@ -31,22 +39,35 @@ int main() {
         if (!n) break;
         unordered_map<string, int> nameToIndex;
         vector<vector<int>> tree(n);
-        string name;
-        cin >> name;
-        nameToIndex[name] = 0;
+        string boss;
+        string employee;
+        cin >> boss;
+        nameToIndex[boss] = 0;
+        int ID = 1;
         for (int i = 1; i < n; i++) {
-            cin >> name;
-            nameToIndex[name] = i;
-            cin >> name;
-            tree[nameToIndex[name]].push_back(i);
+            cin >> employee >> boss;
+            if (nameToIndex.find(employee) == nameToIndex.end()) {
+                nameToIndex[employee] = ID++;
+            }
+            if (nameToIndex.find(boss) == nameToIndex.end()) {
+                nameToIndex[boss] = ID++;
+            }
+            tree[nameToIndex[boss]].push_back(nameToIndex[employee]);
         }
-        vector<vector<int>> inOrOut( {vector<int>(n, 1), vector<int>(n, 0)});
-        vector<vector<bool>> ambigInOrOut(2, vector<bool>(n, false));
-        dfs(tree, 0, inOrOut, ambigInOrOut);
-        bool in = inOrOut[0][0] > inOrOut[1][0];
-        bool ambig = in ? ambigInOrOut[0][0] : ambigInOrOut[1][0];
-        if (inOrOut[0][0] == inOrOut[1][0]) ambig = true;
-        cout << (in ? inOrOut[0][0] : inOrOut[1][0]) << " " << (ambig ? "No" : "Yes") << endl;
+        vector<WeightUnique> in(n);
+        vector<WeightUnique> out(n);
+        dfs(tree, 0, in, out);
+        bool isUniqueMIS = in[0].isUnique;
+        int maxPeople = in[0].weight;
+        if (in[0].weight < out[0].weight) {
+            maxPeople = out[0].weight;
+            isUniqueMIS = out[0].isUnique;
+        }
+        else if (in[0].weight == out[0].weight) {
+            isUniqueMIS = false;
+        }
+
+        cout << maxPeople << " " << (isUniqueMIS ? "Yes" : "No") << endl;
     }
     return 0;
 }
