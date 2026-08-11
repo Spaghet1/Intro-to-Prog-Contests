@@ -1,6 +1,4 @@
-#include <vector>
 #include <string>
-#include <cstdint>
 #include <iostream>
 
 class Solution {
